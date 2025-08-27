@@ -112,7 +112,7 @@
     </footer>
 
     <script>
-      const WEATHER_KEY = "b41c8a848eb38ccfec6dbcaa3f2cc68a"; // ⬅️ Pega aquí tu API Key de OpenWeatherMap
+      const WEATHER_KEY = "b41c8a848eb38ccfec6dbcaa3f2cc68a";
 
       const qs = (s, ctx = document) => ctx.querySelector(s);
       async function fechLat(city) {
@@ -167,7 +167,7 @@
         try {
           const locationData = await fechLat(city);
           if (locationData.length === 0) throw new Error("Ciudad no encontrada");
-          const { lat, lon } = locationData[0];//Destructuracion de latitud y longitud sin ello seria locationData[0].lat y locationData[0].lon
+          const { lat, lon } = locationData[0];
           const data = await fetchWeather(lat, lon);
           console.log(data);
           renderWeather(city, data);
