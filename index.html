@@ -1,395 +1,636 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  
-  <meta charset="utf-8" lang="es" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Travel Explorer – Inspírate y descubre destinos</title>
-  <meta name="description" content="Busca destinos, inspírate con fotos de alta calidad y lee un resumen del lugar. Hecho con HTML, Tailwind y JavaScript.">
-  <meta name="theme-color" content="#0ea5e9" />
-  <meta property="og:title" content="Travel Explorer – Demo Frontend" />
-  <meta property="og:description" content="App estática: búsquedas con Unsplash + Wikipedia, favoritos y UI pulida." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200" />
+  <head>
+    <meta charset="utf-8" lang="es" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Travel Explorer – Inspírate y descubre destinos</title>
+    <meta
+      name="description"
+      content="Busca destinos, inspírate con fotos de alta calidad y lee un resumen del lugar. Hecho con HTML, Tailwind y JavaScript."
+    />
+    <meta name="theme-color" content="#0ea5e9" />
+    <meta property="og:title" content="Travel Explorer – Demo Frontend" />
+    <meta
+      property="og:description"
+      content="App estática: búsquedas con Unsplash + Wikipedia, favoritos y UI pulida."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200"
+    />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
-          boxShadow: {
-            soft: '0 10px 20px rgba(2, 6, 23, 0.08), 0 2px 6px rgba(2, 6, 23, 0.06)'
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    .shimmer {
-      position: relative;
-      overflow: hidden;
-      background: #e5e7eb;
-    }
-    .shimmer::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(90deg, rgba(229,231,235,0) 0%, rgba(255,255,255,0.8) 50%, rgba(229,231,235,0) 100%);
-      animation: shimmer 1.25s infinite;
-    }
-    @keyframes shimmer {
-      100% { transform: translateX(100%); }
-    }
-    .hidden-visually { position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
-  </style>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230ea5e9'/%3E%3Cpath d='M18 36l10-10 8 8 10-10' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
-</head>
-<body class="bg-slate-50 text-slate-900 antialiased">
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <a href="#" class="flex items-center gap-3 group" aria-label="Inicio">
-        <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-500 shadow-soft">
-          <span class="text-white font-bold">TE</span>
-        </span>
-        <span class="font-semibold tracking-tight group-hover:text-sky-600 transition">Travel Explorer</span>
-      </a>
-      <nav class="flex items-center gap-3">
-        <button id="favoritesBtn" class="relative inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft transition">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.645 20.91l-.007-.003-.022-.01a15.247 15.247 0 01-.383-.183 25.18 25.18 0 01-4.244-2.62C4.688 16.251 2 13.856 2 10.5 2 8.015 3.79 6 6.2 6c1.676 0 3.09.789 3.996 2.011a.75.75 0 001.207 0C12.31 6.789 13.724 6 15.4 6 17.81 6 19.6 8.015 19.6 10.5c0 3.356-2.688 5.752-4.989 7.594a25.175 25.175 0 01-4.244 2.62 15.247 15.247 0 01-.383.183l-.022.01-.007.003-.003.002a.75.75 0 01-.644 0l-.003-.002z"/></svg>
-          <span>Favoritos</span>
-          <span id="favCount" class="ml-1 inline-flex items-center justify-center rounded-full bg-sky-500 px-2 text-xs font-semibold text-white">0</span>
-        </button>
-        <a class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft transition"
-           href="https://github.com/miguel04fr" target="_blank" rel="noopener" aria-label="Ver código en GitHub">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.59 2 12.253c0 4.52 2.865 8.354 6.839 9.708.5.095.682-.221.682-.49 0-.242-.009-.883-.014-1.733-2.782.617-3.369-1.36-3.369-1.36-.454-1.176-1.11-1.49-1.11-1.49-.908-.636.069-.623.069-.623 1.004.073 1.532 1.05 1.532 1.05.892 1.566 2.341 1.114 2.91.852.091-.662.35-1.115.636-1.372-2.22-.257-4.555-1.144-4.555-5.09 0-1.124.39-2.042 1.029-2.763-.103-.259-.446-1.298.098-2.705 0 0 .84-.27 2.75 1.055A9.337 9.337 0 0112 6.844a9.32 9.32 0 012.504.347c1.909-1.325 2.748-1.055 2.748-1.055.546 1.407.203 2.446.1 2.705.64.721 1.028 1.64 1.028 2.763 0 3.956-2.338 4.83-4.566 5.083.359.316.679.94.679 1.896 0 1.369-.013 2.474-.013 2.81 0 .271.18.588.688.488C19.138 20.604 22 16.771 22 12.253 22 6.59 17.523 2 12 2z" clip-rule="evenodd"/></svg>
-          <span>GitHub</span>
-        </a>
-      </nav>
-    </div>
-  </header>
-
-
-  <main>
-    <section class="relative">
-      <div class="absolute inset-0 -z-10 bg-gradient-to-b from-sky-50 to-transparent"></div>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div class="grid md:grid-cols-2 gap-10 items-center">
-          <div>
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              Inspírate y descubre tu <span class="text-sky-600">próximo destino</span>
-            </h1>
-            <p class="mt-4 text-slate-600 text-base md:text-lg">
-              Busca un lugar, mira fotos espectaculares y lee un resumen rápido del sitio. Añade a favoritos para guardarlo.
-            </p>
-  
-            <form id="searchForm" class="mt-6" role="search" aria-label="Buscar destinos">
-              <label for="searchInput" class="hidden-visually">Destino</label>
-              <div class="flex gap-2">
-                <input id="searchInput" name="q" type="text" inputmode="search" required
-                       placeholder="Busca un destino (p. ej., París)"
-                       class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
-                       autocomplete="off" />
-                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-white font-semibold shadow-soft hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-                  Buscar
-                </button>
-              </div>
-              <div class="mt-4 flex flex-wrap gap-2" aria-label="Búsquedas populares">
-                <button type="button" class="chip" data-q="París">París</button>
-                <button type="button" class="chip" data-q="Tokio">Tokio</button>
-                <button type="button" class="chip" data-q="Lisboa">Lisboa</button>
-                <button type="button" class="chip" data-q="Marrakech">Marrakech</button>
-                <button type="button" class="chip" data-q="Ciudad de México">Ciudad de México</button>
-                <button type="button" class="chip" data-q="Bali">Bali</button>
-              </div>
-            </form>
-          </div>
-          <div class="relative">
-            <div class="aspect-[4/3] w-full rounded-3xl overflow-hidden shadow-soft">
-              <img id="heroImg" alt="Collage de destinos" class="h-full w-full object-cover" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80&auto=format&fit=crop"/>
-            </div>
-            <p class="mt-3 text-sm text-slate-500">Fotos proporcionadas por <a class="underline hover:text-slate-700" href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="resultsSection" class="py-10 hidden" aria-live="polite">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <h2 id="resultsTitle" class="text-2xl font-bold tracking-tight">Resultados</h2>
-            <p id="resultsSubtitle" class="text-slate-600 mt-1">Mostrando resultados para…</p>
-          </div>
-          <a id="detailLink" href="#" class="hidden md:inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft" aria-label="Ver clima del destino">
-            Ver clima (beta)
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-
-        <div id="wikiCard" class="hidden mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-soft">
-          <div class="flex items-start gap-4">
-            <div class="shrink-0 hidden sm:block h-16 w-16 rounded-xl overflow-hidden bg-slate-100">
-              <img id="wikiThumb" alt="Miniatura" class="h-full w-full object-cover" />
-            </div>
-            <div class="min-w-0">
-              <h3 id="wikiTitle" class="text-lg font-semibold"></h3>
-              <p id="wikiExtract" class="mt-1 text-slate-700"></p>
-              <a id="wikiUrl" target="_blank" rel="noopener" class="inline-flex items-center gap-2 mt-3 text-sky-700 hover:underline">Leer en Wikipedia
-                <svg xmlns="https://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-        <div id="skeletons" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
-          <div class="h-56 rounded-2xl shimmer"></div>
-          <div class="h-56 rounded-2xl shimmer"></div>
-          <div class="h-56 rounded-2xl shimmer"></div>
-          <div class="h-56 rounded-2xl shimmer"></div>
-          <div class="h-56 rounded-2xl shimmer"></div>
-          <div class="h-56 rounded-2xl shimmer"></div>
-        </div>
-
-        <p id="emptyState" class="hidden text-center text-slate-600 mt-6">No encontramos resultados para esa búsqueda. Prueba con otro destino.</p>
-        <p id="errorState" class="hidden text-center text-red-600 mt-6">Ocurrió un error al cargar. Revisa tu conexión e inténtalo de nuevo.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer class="mt-10 border-t border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p><span class="font-semibold">Miguel Folguera Rivera</span> — Frontend Developer</p>
-   
-    </div>
-  </footer>
-
-  <script>
-  
-    const UNSPLASH_KEY = "en5ZNCLqouOakfydimz6eqU5dSyaEhXe-Evx1dztSbY";
-    const RESULTS_PER_PAGE = 12;
-
-
-    const qs = (sel, ctx=document) => ctx.querySelector(sel);
-    const qsa = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-    const fmt = (s) => s?.trim();
-
-    const state = {
-      currentQuery: "",
-      favorites: loadFavorites(), 
-    };
-
-    function loadFavorites() {
-      try {
-        const raw = localStorage.getItem('favouritess');
-        return new Map(raw ? JSON.parse(raw).map(x => [x.id, x]) : []);
-      } catch (_) { return new Map(); }
-    }
-    function saveFavorites() {
-      localStorage.setItem('favouritess', JSON.stringify(Array.from(state.favorites.values())));
-    }
-    function updateFavCount() {
-      qs('#favCount').textContent = state.favorites.size;
-    }
-
-    function setSectionVisibility({ loading=false, show=false, empty=false, error=false }) {
-      qs('#resultsSection').classList.toggle('hidden', !show && !loading && !empty && !error);
-      qs('#skeletons').classList.toggle('hidden', !loading);
-      qs('#grid').classList.toggle('hidden', loading || empty || error);
-      qs('#emptyState').classList.toggle('hidden', !empty);
-      qs('#errorState').classList.toggle('hidden', !error);
-    }
-
-    function encodeTopic(str) {
-      return encodeURIComponent(str.replace(/\s+/g, '_'));
-    }
-
-
-    async function searchUnsplash(query) {
-      if (!UNSPLASH_KEY) throw new Error('Falta UNSPLASH_KEY');
-      const url = new URL('https://api.unsplash.com/search/photos');
-      url.searchParams.set('query', query);
-      url.searchParams.set('per_page', RESULTS_PER_PAGE);
-      url.searchParams.set('content_filter', 'high');
-      url.searchParams.set('orientation', 'landscape');
-
-      const res = await fetch(url.toString(), {
-        headers: {
-          'Accept-Version': 'v1',
-          'Authorization': `Client-ID ${UNSPLASH_KEY}`
-        }
-      });
-      if (!res.ok) throw new Error('Unsplash error');
-      const data = await res.json();
-      return data.results.map(photo => ({
-        id: photo.id,
-        alt: photo.alt_description || `Foto de ${query}`,
-        url: photo.urls.regular,
-        urlSmall: photo.urls.small,
-        author: photo.user.name,
-        authorUrl: photo.user.links.html,
-        photoUrl: photo.links.html,
-      }));
-    }
-
-    async function fetchWikiSummary(query) {
-      const url = `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeTopic(query)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Wikipedia error');
-      const data = await res.json();
-      return {
-        title: data.title,
-        extract: data.extract,
-        url: data.content_urls?.desktop?.page || data.content_urls?.mobile?.page || `https://es.wikipedia.org/wiki/${encodeTopic(query)}`,
-        thumbnail: data.thumbnail?.source || '',
-        isDisambiguation: data.type === 'disambiguation'
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+            boxShadow: {
+              soft: "0 10px 20px rgba(2, 6, 23, 0.08), 0 2px 6px rgba(2, 6, 23, 0.06)",
+            },
+          },
+        },
       };
-    }
+    </script>
 
-    function renderWikiCard(info) {
-      const card = qs('#wikiCard');
-      qs('#wikiTitle').textContent = info.title || state.currentQuery;
-      qs('#wikiExtract').textContent = info.extract || 'No hay descripción disponible.';
-      qs('#wikiUrl').href = info.url;
-      const thumb = qs('#wikiThumb');
-      if (info.thumbnail) {
-        thumb.src = info.thumbnail;
-        thumb.alt = `Imagen de ${info.title}`;
-        thumb.parentElement.classList.remove('hidden');
-      } else {
-        thumb.removeAttribute('src');
-        thumb.alt = '';
-        thumb.parentElement.classList.add('hidden');
+    <style>
+      .shimmer {
+        position: relative;
+        overflow: hidden;
+        background: #e5e7eb;
       }
-      card.classList.remove('hidden');
-    }
+      .shimmer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(
+          90deg,
+          rgba(229, 231, 235, 0) 0%,
+          rgba(255, 255, 255, 0.8) 50%,
+          rgba(229, 231, 235, 0) 100%
+        );
+        animation: shimmer 1.25s infinite;
+      }
+      @keyframes shimmer {
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      .hidden-visually {
+        position: absolute !important;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+    </style>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230ea5e9'/%3E%3Cpath d='M18 36l10-10 8 8 10-10' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased">
+    <header
+      class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-200"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+      >
+        <a href="#" class="flex items-center gap-3 group" aria-label="Inicio">
+          <span
+            class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-500 shadow-soft"
+          >
+            <span class="text-white font-bold">TE</span>
+          </span>
+          <span
+            class="font-semibold tracking-tight group-hover:text-sky-600 transition"
+            >Travel Explorer</span
+          >
+        </a>
+        <nav class="flex items-center gap-3">
+          <button
+            id="favoritesBtn"
+            class="relative inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M11.645 20.91l-.007-.003-.022-.01a15.247 15.247 0 01-.383-.183 25.18 25.18 0 01-4.244-2.62C4.688 16.251 2 13.856 2 10.5 2 8.015 3.79 6 6.2 6c1.676 0 3.09.789 3.996 2.011a.75.75 0 001.207 0C12.31 6.789 13.724 6 15.4 6 17.81 6 19.6 8.015 19.6 10.5c0 3.356-2.688 5.752-4.989 7.594a25.175 25.175 0 01-4.244 2.62 15.247 15.247 0 01-.383.183l-.022.01-.007.003-.003.002a.75.75 0 01-.644 0l-.003-.002z"
+              />
+            </svg>
+            <span>Favoritos</span>
+            <span
+              id="favCount"
+              class="ml-1 inline-flex items-center justify-center rounded-full bg-sky-500 px-2 text-xs font-semibold text-white"
+              >0</span
+            >
+          </button>
+          <a
+            class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft transition"
+            href="https://github.com/miguel04fr"
+            target="_blank"
+            rel="noopener"
+            aria-label="Ver código en GitHub"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              class="h-5 w-5"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12 2C6.477 2 2 6.59 2 12.253c0 4.52 2.865 8.354 6.839 9.708.5.095.682-.221.682-.49 0-.242-.009-.883-.014-1.733-2.782.617-3.369-1.36-3.369-1.36-.454-1.176-1.11-1.49-1.11-1.49-.908-.636.069-.623.069-.623 1.004.073 1.532 1.05 1.532 1.05.892 1.566 2.341 1.114 2.91.852.091-.662.35-1.115.636-1.372-2.22-.257-4.555-1.144-4.555-5.09 0-1.124.39-2.042 1.029-2.763-.103-.259-.446-1.298.098-2.705 0 0 .84-.27 2.75 1.055A9.337 9.337 0 0112 6.844a9.32 9.32 0 012.504.347c1.909-1.325 2.748-1.055 2.748-1.055.546 1.407.203 2.446.1 2.705.64.721 1.028 1.64 1.028 2.763 0 3.956-2.338 4.83-4.566 5.083.359.316.679.94.679 1.896 0 1.369-.013 2.474-.013 2.81 0 .271.18.588.688.488C19.138 20.604 22 16.771 22 12.253 22 6.59 17.523 2 12 2z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>GitHub</span>
+          </a>
+        </nav>
+      </div>
+    </header>
 
-    function renderGrid(items) {
-      const grid = qs('#grid');
-      grid.innerHTML = '';
-      const frag = document.createDocumentFragment();
+    <main>
+      <section class="relative">
+        <div
+          class="absolute inset-0 -z-10 bg-gradient-to-b from-sky-50 to-transparent"
+        ></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+          <div class="grid md:grid-cols-2 gap-10 items-center">
+            <div>
+              <h1
+                class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight"
+              >
+                Inspírate y descubre tu
+                <span class="text-sky-600">próximo destino</span>
+              </h1>
+              <p class="mt-4 text-slate-600 text-base md:text-lg">
+                Busca un lugar, mira fotos espectaculares y lee un resumen
+                rápido del sitio. Añade a favoritos para guardarlo.
+              </p>
 
-      items.forEach(item => {
-        const isFav = state.favorites.has(item.id);
-        const card = document.createElement('article');
-        card.className = 'group relative rounded-2xl overflow-hidden bg-white shadow-soft border border-slate-200';
-        card.innerHTML = `
+              <form
+                id="searchForm"
+                class="mt-6"
+                role="search"
+                aria-label="Buscar destinos"
+              >
+                <label for="searchInput" class="hidden-visually">Destino</label>
+                <div class="flex gap-2">
+                  <input
+                    id="searchInput"
+                    name="q"
+                    type="text"
+                    inputmode="search"
+                    required
+                    placeholder="Busca un destino (p. ej., París)"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
+                    autocomplete="off"
+                  />
+                  <button
+                    type="submit"
+                    class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-white font-semibold shadow-soft hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="M21 21l-4.3-4.3" />
+                    </svg>
+                    Buscar
+                  </button>
+                </div>
+                <div
+                  class="mt-4 flex flex-wrap gap-2"
+                  aria-label="Búsquedas populares"
+                >
+                  <button type="button" class="chip" data-q="París">
+                    París
+                  </button>
+                  <button type="button" class="chip" data-q="Tokio">
+                    Tokio
+                  </button>
+                  <button type="button" class="chip" data-q="Lisboa">
+                    Lisboa
+                  </button>
+                  <button type="button" class="chip" data-q="Marrakech">
+                    Marrakech
+                  </button>
+                  <button type="button" class="chip" data-q="Ciudad de México">
+                    Ciudad de México
+                  </button>
+                  <button type="button" class="chip" data-q="Bali">Bali</button>
+                </div>
+              </form>
+            </div>
+            <div class="relative">
+              <div
+                class="aspect-[4/3] w-full rounded-3xl overflow-hidden shadow-soft"
+              >
+                <img
+                  id="heroImg"
+                  alt="Collage de destinos"
+                  class="h-full w-full object-cover"
+                  src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80&auto=format&fit=crop"
+                />
+              </div>
+              <p class="mt-3 text-sm text-slate-500">
+                Fotos proporcionadas por
+                <a
+                  class="underline hover:text-slate-700"
+                  href="https://unsplash.com"
+                  target="_blank"
+                  rel="noopener"
+                  >Unsplash</a
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="resultsSection" class="py-10 hidden" aria-live="polite">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <h2 id="resultsTitle" class="text-2xl font-bold tracking-tight">
+                Resultados
+              </h2>
+              <p id="resultsSubtitle" class="text-slate-600 mt-1">
+                Mostrando resultados para…
+              </p>
+            </div>
+            <a
+              id="detailLink"
+              href="#"
+              class="hidden md:inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft"
+              aria-label="Ver clima del destino"
+            >
+              Ver clima (beta)
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14" />
+                <path d="M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+
+          <div
+            id="wikiCard"
+            class="hidden mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-soft"
+          >
+            <div class="flex items-start gap-4">
+              <div
+                class="shrink-0 hidden sm:block h-16 w-16 rounded-xl overflow-hidden bg-slate-100"
+              >
+                <img
+                  id="wikiThumb"
+                  alt="Miniatura"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="min-w-0">
+                <h3 id="wikiTitle" class="text-lg font-semibold"></h3>
+                <p id="wikiExtract" class="mt-1 text-slate-700"></p>
+                <a
+                  id="wikiUrl"
+                  target="_blank"
+                  rel="noopener"
+                  class="inline-flex items-center gap-2 mt-3 text-sky-700 hover:underline"
+                  >Leer en Wikipedia
+                  <svg
+                    xmlns="https://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="M12 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="grid"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          ></div>
+
+          <div
+            id="skeletons"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden"
+          >
+            <div class="h-56 rounded-2xl shimmer"></div>
+            <div class="h-56 rounded-2xl shimmer"></div>
+            <div class="h-56 rounded-2xl shimmer"></div>
+            <div class="h-56 rounded-2xl shimmer"></div>
+            <div class="h-56 rounded-2xl shimmer"></div>
+            <div class="h-56 rounded-2xl shimmer"></div>
+          </div>
+
+          <p id="emptyState" class="hidden text-center text-slate-600 mt-6">
+            No encontramos resultados para esa búsqueda. Prueba con otro
+            destino.
+          </p>
+          <p id="errorState" class="hidden text-center text-red-600 mt-6">
+            Ocurrió un error al cargar. Revisa tu conexión e inténtalo de nuevo.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-10 border-t border-slate-200">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4"
+      >
+        <p>
+          <span class="font-semibold">Miguel Folguera Rivera</span> — Frontend
+          Developer
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      const UNSPLASH_KEY = "en5ZNCLqouOakfydimz6eqU5dSyaEhXe-Evx1dztSbY";
+      const RESULTS_PER_PAGE = 12;
+
+      const qs = (sel, ctx = document) => ctx.querySelector(sel);
+      const qsa = (sel, ctx = document) =>
+        Array.from(ctx.querySelectorAll(sel));
+      const fmt = (s) => s?.trim();
+
+      const state = {
+        currentQuery: "",
+        favorites: loadFavorites(),
+      };
+
+      function loadFavorites() {
+        try {
+          const raw = localStorage.getItem("favouritess");
+          return new Map(raw ? JSON.parse(raw).map((x) => [x.id, x]) : []);
+        } catch (_) {
+          return new Map();
+        }
+      }
+      function saveFavorites() {
+        localStorage.setItem(
+          "favouritess",
+          JSON.stringify(Array.from(state.favorites.values()))
+        );
+      }
+      function updateFavCount() {
+        qs("#favCount").textContent = state.favorites.size;
+      }
+
+      function setSectionVisibility({
+        loading = false,
+        show = false,
+        empty = false,
+        error = false,
+      }) {
+        qs("#resultsSection").classList.toggle(
+          "hidden",
+          !show && !loading && !empty && !error
+        );
+        qs("#skeletons").classList.toggle("hidden", !loading);
+        qs("#grid").classList.toggle("hidden", loading || empty || error);
+        qs("#emptyState").classList.toggle("hidden", !empty);
+        qs("#errorState").classList.toggle("hidden", !error);
+      }
+
+      function encodeTopic(str) {
+        return encodeURIComponent(str.replace(/\s+/g, "_"));
+      }
+
+      async function searchUnsplash(query) {
+        if (!UNSPLASH_KEY) throw new Error("Falta UNSPLASH_KEY");
+        const url = new URL("https://api.unsplash.com/search/photos");
+        url.searchParams.set("query", query);
+        url.searchParams.set("per_page", RESULTS_PER_PAGE);
+        url.searchParams.set("content_filter", "high");
+        url.searchParams.set("orientation", "landscape");
+
+        const res = await fetch(url.toString(), {
+          headers: {
+            "Accept-Version": "v1",
+            Authorization: `Client-ID ${UNSPLASH_KEY}`,
+          },
+        });
+        if (!res.ok) throw new Error("Unsplash error");
+        const data = await res.json();
+        return data.results.map((photo) => ({
+          id: photo.id,
+          alt: photo.alt_description || `Foto de ${query}`,
+          url: photo.urls.regular,
+          urlSmall: photo.urls.small,
+          author: photo.user.name,
+          authorUrl: photo.user.links.html,
+          photoUrl: photo.links.html,
+        }));
+      }
+
+      async function fetchWikiSummary(query) {
+        const url = `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeTopic(
+          query
+        )}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Wikipedia error");
+        const data = await res.json();
+        return {
+          title: data.title,
+          extract: data.extract,
+          url:
+            data.content_urls?.desktop?.page ||
+            data.content_urls?.mobile?.page ||
+            `https://es.wikipedia.org/wiki/${encodeTopic(query)}`,
+          thumbnail: data.thumbnail?.source || "",
+          isDisambiguation: data.type === "disambiguation",
+        };
+      }
+
+      function renderWikiCard(info) {
+        const card = qs("#wikiCard");
+        qs("#wikiTitle").textContent = info.title || state.currentQuery;
+        qs("#wikiExtract").textContent =
+          info.extract || "No hay descripción disponible.";
+        qs("#wikiUrl").href = info.url;
+        const thumb = qs("#wikiThumb");
+        if (info.thumbnail) {
+          thumb.src = info.thumbnail;
+          thumb.alt = `Imagen de ${info.title}`;
+          thumb.parentElement.classList.remove("hidden");
+        } else {
+          thumb.removeAttribute("src");
+          thumb.alt = "";
+          thumb.parentElement.classList.add("hidden");
+        }
+        card.classList.remove("hidden");
+      }
+
+      function renderGrid(items) {
+        console.log(items);
+        const grid = qs("#grid");
+        grid.innerHTML = "";
+        const frag = document.createDocumentFragment();
+
+        items.forEach((item) => {
+          const isFav = state.favorites.has(item.id);
+          const card = document.createElement("article");
+          card.className =
+            "group relative rounded-2xl overflow-hidden bg-white shadow-soft border border-slate-200";
+          card.innerHTML = `
           <div class="relative aspect-[4/3] overflow-hidden">
-            <img src="${item.url}" alt="${item.alt}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy"/>
-            <button class="favBtn absolute top-3 right-3 inline-flex items-center justify-center rounded-full bg-white/90 hover:bg-white h-10 w-10 shadow-soft" aria-label="Añadir a favoritos" data-id="${item.id}">
-              <svg data-heart xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 ${isFav ? 'text-rose-600' : 'text-slate-600'}" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.01a15.247 15.247 0 01-.383-.183 25.18 25.18 0 01-4.244-2.62C4.688 16.251 2 13.856 2 10.5 2 8.015 3.79 6 6.2 6c1.676 0 3.09.789 3.996 2.011a.75.75 0 001.207 0C12.31 6.789 13.724 6 15.4 6 17.81 6 19.6 8.015 19.6 10.5c0 3.356-2.688 5.752-4.989 7.594a25.175 25.175 0 01-4.244 2.62 15.247 15.247 0 01-.383.183l-.022.01-.007.003-.003.002a.75.75 0 01-.644 0l-.003-.002z"/></svg>
+            <img src="${item.url}" alt="${
+            item.alt
+          }" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy"/>
+            <button class="favBtn absolute top-3 right-3 inline-flex items-center justify-center rounded-full bg-white/90 hover:bg-white h-10 w-10 shadow-soft" aria-label="Añadir a favoritos" data-id="${
+              item.id
+            }">
+              <svg data-heart xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 ${
+                isFav ? "text-rose-600" : "text-slate-600"
+              }" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.01a15.247 15.247 0 01-.383-.183 25.18 25.18 0 01-4.244-2.62C4.688 16.251 2 13.856 2 10.5 2 8.015 3.79 6 6.2 6c1.676 0 3.09.789 3.996 2.011a.75.75 0 001.207 0C12.31 6.789 13.724 6 15.4 6 17.81 6 19.6 8.015 19.6 10.5c0 3.356-2.688 5.752-4.989 7.594a25.175 25.175 0 01-4.244 2.62 15.247 15.247 0 01-.383.183l-.022.01-.007.003-.003.002a.75.75 0 01-.644 0l-.003-.002z"/></svg>
             </button>
           </div>
           <div class="p-4">
             <div class="flex items-center justify-between gap-3">
               <h3 class="font-semibold truncate">${state.currentQuery}</h3>
-              <a href="detalle.html?city=${encodeURIComponent(state.currentQuery)}" class="inline-flex items-center gap-1 text-sm text-sky-700 hover:underline">Ver clima
+              <a href="noticias.html?city=${encodeURIComponent(
+                state.currentQuery
+              )}" class="inline-flex items-center gap-1 text-sm text-sky-700 hover:underline">Ver noticias
+              </a>
+               <a href="detalle.html?city=${encodeURIComponent(
+                 state.currentQuery
+               )}" class="inline-flex items-center gap-1 text-sm text-sky-700 hover:underline">Ver clima
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
               </a>
             </div>
-            <p class="mt-1 text-sm text-slate-600 truncate">Foto de <a class="hover:underline" href="${item.authorUrl}" target="_blank" rel="noopener">${item.author}</a> en Unsplash</p>
+            <p class="mt-1 text-sm text-slate-600 truncate">Foto de <a class="hover:underline" href="${
+              item.authorUrl
+            }" target="_blank" rel="noopener">${item.author}</a> en Unsplash</p>
           </div>
         `;
 
-        card.querySelector('.favBtn').addEventListener('click', () => toggleFavorite(item, card));
-        frag.appendChild(card);
-      });
-
-      grid.appendChild(frag);
-    }
-
-    function toggleFavorite(item, cardEl) {
-      if (state.favorites.has(item.id)) {
-        state.favorites.delete(item.id);
-      } else {
-        state.favorites.set(item.id, item);
-      }
-      saveFavorites();
-      updateFavCount();
-      const heart = cardEl.querySelector('[data-heart]');
-      heart.classList.toggle('text-rose-600');
-      heart.classList.toggle('text-slate-600');
-    }
-
-    async function performSearch(query) {
-      state.currentQuery = query;
-      qs('#resultsTitle').textContent = `Resultados para "${query}"`;
-      qs('#resultsSubtitle').textContent = 'Inspiración visual y resumen del destino';
-      qs('#detailLink').classList.remove('hidden');
-      qs('#detailLink').href = `detalle.html?city=${encodeURIComponent(query)}`;
-      setSectionVisibility({ loading: true });
-
-      try {
-        const [photos, wiki] = await Promise.all([
-          searchUnsplash(query),
-          fetchWikiSummary(query).catch(() => ({ title: query, extract: '', url: '#', thumbnail: '' }))
-        ]);
-
-        // Render
-        renderGrid(photos);
-        if (wiki) renderWikiCard(wiki);
-
-   
-        if (photos?.[0]?.url) {
-          qs('#heroImg').src = photos[0].url;
-          qs('#heroImg').alt = photos[0].alt || `Imagen de ${query}`;
-        }
-
-        setSectionVisibility({ show: true });
-        if (!photos || photos.length === 0) {
-          setSectionVisibility({ empty: true });
-        }
-      } catch (err) {
-        console.error(err);
-        setSectionVisibility({ error: true });
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-
-      qsa('.chip').forEach(btn => {
-        btn.className = 'inline-flex items-center rounded-full border border-slate-300 px-3 py-1 text-sm hover:border-sky-400 hover:text-sky-700 transition';
-        btn.addEventListener('click', () => {
-          const q = btn.dataset.q;
-          qs('#searchInput').value = q;
-          performSearch(q);
+          card
+            .querySelector(".favBtn")
+            .addEventListener("click", () => toggleFavorite(item, card));
+          frag.appendChild(card);
         });
+
+        grid.appendChild(frag);
+      }
+
+      function toggleFavorite(item, cardEl) {
+        if (state.favorites.has(item.id)) {
+          state.favorites.delete(item.id);
+        } else {
+          state.favorites.set(item.id, item);
+        }
+        saveFavorites();
+        updateFavCount();
+        const heart = cardEl.querySelector("[data-heart]");
+        heart.classList.toggle("text-rose-600");
+        heart.classList.toggle("text-slate-600");
+      }
+
+      async function performSearch(query) {
+        state.currentQuery = query;
+        qs("#resultsTitle").textContent = `Resultados para "${query}"`;
+        qs("#resultsSubtitle").textContent =
+          "Inspiración visual y resumen del destino";
+        qs("#detailLink").classList.remove("hidden");
+        qs("#detailLink").href = `detalle.html?city=${encodeURIComponent(
+          query
+        )}`;
+        setSectionVisibility({ loading: true });
+
+        try {
+          const [photos, wiki] = await Promise.all([
+            searchUnsplash(query),
+            fetchWikiSummary(query).catch(() => ({
+              title: query,
+              extract: "",
+              url: "#",
+              thumbnail: "",
+            })),
+          ]);
+
+          // Render
+          renderGrid(photos);
+          if (wiki) renderWikiCard(wiki);
+
+          if (photos?.[0]?.url) {
+            qs("#heroImg").src = photos[0].url;
+            qs("#heroImg").alt = photos[0].alt || `Imagen de ${query}`;
+          }
+
+          setSectionVisibility({ show: true });
+          if (!photos || photos.length === 0) {
+            setSectionVisibility({ empty: true });
+          }
+        } catch (err) {
+          console.error(err);
+          setSectionVisibility({ error: true });
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        qsa(".chip").forEach((btn) => {
+          btn.className =
+            "inline-flex items-center rounded-full border border-slate-300 px-3 py-1 text-sm hover:border-sky-400 hover:text-sky-700 transition";
+          btn.addEventListener("click", () => {
+            const q = btn.dataset.q;
+            qs("#searchInput").value = q;
+            performSearch(q);
+          });
+        });
+
+        qs("#searchForm").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const value = qs("#searchInput")
+            .value.toLowerCase()
+            .split(" ")
+            .filter(Boolean) // elimina espacios dobles
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+
+          if (!value) return;
+          performSearch(value);
+        });
+
+        qs("#favoritesBtn").addEventListener("click", () => {
+          if (state.favorites.size === 0)
+            return alert(
+              "Aún no tienes favoritos. Usa el corazón en cualquier foto."
+            );
+          qs("#resultsTitle").textContent = "Tus favoritos";
+          qs(
+            "#resultsSubtitle"
+          ).textContent = `${state.favorites.size} guardados en este dispositivo`;
+          qs("#detailLink").classList.add("hidden");
+          renderGrid(Array.from(state.favorites.values()));
+          qs("#wikiCard").classList.add("hidden");
+          setSectionVisibility({ show: true });
+        });
+
+        updateFavCount();
+
+        qs("#searchInput").value = "París";
+
+        if (UNSPLASH_KEY) performSearch("París");
       });
-
-
-      qs('#searchForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const value = fmt(qs('#searchInput').value);
-        if (!value) return;
-        performSearch(value);
-      });
-
- 
-      qs('#favoritesBtn').addEventListener('click', () => {
-        if (state.favorites.size === 0) return alert('Aún no tienes favoritos. Usa el corazón en cualquier foto.');
-        qs('#resultsTitle').textContent = 'Tus favoritos';
-        qs('#resultsSubtitle').textContent = `${state.favorites.size} guardados en este dispositivo`;
-        qs('#detailLink').classList.add('hidden');
-        renderGrid(Array.from(state.favorites.values()));
-        qs('#wikiCard').classList.add('hidden');
-        setSectionVisibility({ show: true });
-      });
-
-      updateFavCount();
-
-      qs('#searchInput').value = 'París';
-  
-      if (UNSPLASH_KEY) performSearch('París');
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

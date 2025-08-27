@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <!-- =========================================================
+    Travel Explorer – Noticias (noticias.html)
+    -----------------------------------------------------------
+    Página que muestra noticias relacionadas con el destino usando
+    la API de GNews. Se accede con ?city=Nombre.
+
+    🔗 API usada:
+    https://gnews.io/api/v4/search?q=<CITY>&lang=es&max=10&apikey=<KEY>
+
+    ⚠️ Notas
+    - Necesitas tu propia API Key de GNews.
+    - El parámetro ?city= controla la búsqueda.
+  ============================================================ -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel Explorer – Noticias del destino</title>
+  <meta name="description" content="Noticias recientes sobre tu destino con GNews API.">
+  <meta name="theme-color" content="#0ea5e9" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter'] } } } }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased">
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <a href="/index.html" class="flex items-center gap-3 group" aria-label="Inicio">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-500 shadow-soft">
+     
+              <span class="text-white font-bold">TE</span>
+            </span>
+            <span class="font-semibold tracking-tight group-hover:text-sky-600 transition">Travel Explorer</span>
+          </a>
+          <nav class="flex items-center gap-3">
+         
+            <a class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium hover:shadow-soft transition"
+               href="https://github.com/miguel04fr" target="_blank" rel="noopener" aria-label="Ver código en GitHub">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.59 2 12.253c0 4.52 2.865 8.354 6.839 9.708.5.095.682-.221.682-.49 0-.242-.009-.883-.014-1.733-2.782.617-3.369-1.36-3.369-1.36-.454-1.176-1.11-1.49-1.11-1.49-.908-.636.069-.623.069-.623 1.004.073 1.532 1.05 1.532 1.05.892 1.566 2.341 1.114 2.91.852.091-.662.35-1.115.636-1.372-2.22-.257-4.555-1.144-4.555-5.09 0-1.124.39-2.042 1.029-2.763-.103-.259-.446-1.298.098-2.705 0 0 .84-.27 2.75 1.055A9.337 9.337 0 0112 6.844a9.32 9.32 0 012.504.347c1.909-1.325 2.748-1.055 2.748-1.055.546 1.407.203 2.446.1 2.705.64.721 1.028 1.64 1.028 2.763 0 3.956-2.338 4.83-4.566 5.083.359.316.679.94.679 1.896 0 1.369-.013 2.474-.013 2.81 0 .271.18.588.688.488C19.138 20.604 22 16.771 22 12.253 22 6.59 17.523 2 12 2z" clip-rule="evenodd"/></svg>
+              <span>GitHub</span>
+            </a>
+          </nav>
+        </div>
+      </header>
+
+  <main>
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 id="newsTitle" class="text-3xl font-extrabold tracking-tight mb-6">Noticias de…</h1>
+
+      <div id="newsContainer" class="space-y-6 hidden"></div>
+
+      <p id="loadingState" class="mt-6 text-slate-600">Cargando noticias…</p>
+      <p id="errorState" class="mt-6 text-red-600 hidden">No se pudo cargar noticias. Intenta más tarde.</p>
+      <p id="emptyState" class="mt-6 text-slate-600 hidden">No se encontraron noticias para este destino.</p>
+    </section>
+  </main>
+
+  <footer class="mt-10 border-t border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-sm text-slate-600 flex justify-between">
+      <p>Hecho por <span class="font-semibold">Tu Nombre</span></p>
+      <a href="index.html" class="hover:underline">← Volver</a>
+    </div>
+  </footer>
+
+  <script>
+    const NEWS_KEY = "7ce7ed2ecda7278950bd8b2806447bd2"; // ⬅️ Pega aquí tu API Key de GNews
+
+    const qs = (s, ctx=document) => ctx.querySelector(s);
+
+    function getCityFromUrl() {
+      const params = new URLSearchParams(location.search);
+      return params.get('city');
+    }
+
+    async function fetchNews(city) {
+      const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(city)}&lang=es&max=10&apikey=${NEWS_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Error al cargar noticias");
+      return res.json();
+    }
+
+    function renderNews(city, data) {
+      qs('#newsTitle').textContent = `Noticias de ${city}`;
+
+      if (!data.articles || data.articles.length === 0) {
+        qs('#emptyState').classList.remove('hidden');
+        qs('#loadingState').classList.add('hidden');
+        return;
+      }
+
+      const container = qs('#newsContainer');
+      container.innerHTML = '';
+
+      data.articles.forEach(article => {
+        const card = document.createElement('article');
+        card.className = "rounded-2xl border border-slate-200 bg-white shadow overflow-hidden";
+
+        card.innerHTML = `
+          <a href="${article.url}" target="_blank" class="block hover:bg-slate-50 transition">
+            <div class="flex flex-col sm:flex-row">
+              ${article.image ? `<img src="${article.image}" alt="Imagen noticia" class="w-full sm:w-48 h-40 object-cover">` : ''}
+              <div class="p-4 flex-1">
+                <h2 class="text-lg font-semibold mb-2">${article.title}</h2>
+                <p class="text-slate-600 mb-2">${article.description || ''}</p>
+                <p class="text-sm text-slate-500">${new Date(article.publishedAt).toLocaleDateString('es-ES')} – ${article.source.name}</p>
+              </div>
+            </div>
+          </a>
+        `;
+        container.appendChild(card);
+      });
+
+      container.classList.remove('hidden');
+      qs('#loadingState').classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const city = getCityFromUrl();
+      if (!city) {
+        qs('#loadingState').textContent = 'Falta parámetro ?city=';
+        return;
+      }
+
+      try {
+        const data = await fetchNews(city);
+        renderNews(city, data);
+      } catch (err) {
+        console.error(err);
+        qs('#loadingState').classList.add('hidden');
+        qs('#errorState').classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
